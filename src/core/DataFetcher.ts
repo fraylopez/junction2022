@@ -3,6 +3,7 @@ import { Plugin, SyncResponse } from "./Plugin";
 import dotenv from "dotenv";
 import assert from "assert";
 import { AppView } from "./AppView";
+import { emit } from "process";
 
 interface PersonalIdentifiableInformation {
   name: string;
@@ -74,9 +75,14 @@ export class DataFetcher {
     this.lifeCycleListeners.get("start")?.();
   }
 
-  async sync(plugin: Plugin) {
-    const response = await plugin.sync();
-    this.emit(plugin.name, "sync", response);
+  async sync(plugin: string): Promise<void>;
+  async sync(plugin: Plugin): Promise<void>;
+  async sync(plugin: Plugin | string): Promise<void> {
+    const plgn = typeof plugin === "string" ? this.plugins.find(p => p.name === plugin) : plugin;
+    assert(plgn, `Plugin ${plugin} not found`);
+
+    const response = await plgn.sync();
+    this.emit(plgn.name, "sync", response);
   }
 
   private emit(plugin: string, event: SyncEvent, data: SyncResponse<unknown>) {
