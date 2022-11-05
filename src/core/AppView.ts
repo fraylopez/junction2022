@@ -39,8 +39,8 @@ export class AppView {
   private async renderSync(plugin: Plugin) {
     console.log(`Syncing ${plugin.name}`);
     //register for sync events
-    const unsubscribe = this.app.subscribe(plugin.name).on((event, syncData: SyncResponse<unknown>) => {
-      console.log(event, JSON.stringify(syncData.data, null, 2));
+    const unsubscribe = this.app.subscribe(plugin.name).on("sync", (syncData: SyncResponse<unknown>) => {
+      console.log(JSON.stringify(syncData.data, null, 2));
     });
     await this.app.sync(plugin);
     this.app.setupSync(plugin.name, 2);

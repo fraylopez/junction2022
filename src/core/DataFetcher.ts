@@ -17,8 +17,8 @@ type SyncEvent = "sync" | "synced" | "syncError";
 export class DataFetcher {
   private plugins: Plugin[] = [];
   private view?: AppView;
-  private lifeCycleListeners: Map<LifecycleEvent, (data?: unknown) => void> = new Map();
-  private pluginListeners: Map<string, ((event: SyncEvent, data: SyncResponse<unknown>) => void)[]>;
+  private lifeCycleListeners: Map<LifecycleEvent, (data?: unknown) => void>;
+  private pluginListeners: Map<string, Map<SyncEvent, (data?: unknown) => void>>;
   constructor() {
     dotenv.config();
     this.plugins = [
@@ -53,15 +53,14 @@ export class DataFetcher {
   subscribe(plugin: string) {
     assert(this.plugins.find(p => p.name === plugin), `Plugin ${plugin} not found`);
     return {
-      on: (callback: (event: SyncEvent, data: SyncResponse<unknown>) => void) => {
-        const listeners = this.pluginListeners.get(plugin) || [];
-        listeners.push(callback);
+      on: (event: SyncEvent, callback: (data: SyncResponse<unknown>) => void) => {
+        const listeners = this.pluginListeners.get(plugin) || new Map();
+        listeners.set(event, callback);
         this.pluginListeners.set(plugin, listeners);
         return () => {
-          const listeners = this.pluginListeners.get(plugin) || [];
-          const index = listeners.indexOf(callback);
-          listeners.splice(index, 1);
-          this.pluginListeners.set(plugin, listeners);
+          const listeners = this.pluginListeners.get(plugin) || new Map();
+          listeners.delete(event);
+
         };
       }
     };
@@ -86,8 +85,8 @@ export class DataFetcher {
   }
 
   private emit(plugin: string, event: SyncEvent, data: SyncResponse<unknown>) {
-    const listeners = this.pluginListeners.get(plugin) || [];
-    listeners.forEach(listener => listener(event, data));
+    const listeners = this.pluginListeners.get(plugin);
+    listeners?.get(event)?.(data);
   }
 
 }

@@ -14,7 +14,7 @@
         "--require=dotenv/config"
       ],
       "args": [
-        "${workspaceFolder}/src/index.ts",
+        "${workspaceFolder}/src/test.ts",
         "--timeout",
         "999999"
       ],
