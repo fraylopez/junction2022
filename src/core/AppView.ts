@@ -1,15 +1,17 @@
-import { Plugin } from "./Plugin";
+import { Plugin, Privacy, SyncResponse } from "./Plugin";
 import prompt from "prompt";
 import { App } from "./App";
 
 export class AppView {
   private plugins: Plugin[];
+  private app!: App;
   constructor() {
     this.plugins = [];
   }
 
   init(app: App) {
-    app.on("start", () => {
+    this.app = app;
+    this.app.on("start", () => {
       this.renderLaunch();
       this.renderSelection();
     });
@@ -18,14 +20,14 @@ export class AppView {
     this.plugins = plugins;
   }
 
-  renderLaunch() {
+  private renderLaunch() {
     console.log("Select a plugin to sync");
     this.plugins.forEach((plugin, i) => {
       console.log(`${i + 1}. ${plugin.name}`);
     });
   }
 
-  renderSelection() {
+  private renderSelection() {
     //capture user input
     prompt.start();
     prompt.get(["plugin"], async (err, result) => {
@@ -35,11 +37,14 @@ export class AppView {
   }
 
   private async renderSync(plugin: Plugin) {
-    // render sync
     console.log(`Syncing ${plugin.name}`);
-    const response = await plugin.sync();
-    // render response
-    console.log(response);
-    this.renderSelection();
+    //register for sync events
+    const unsubscribe = this.app.subscribe(plugin.name).on((event, syncData: SyncResponse<unknown>) => {
+      console.log(event, JSON.stringify(syncData.data, null, 2));
+    });
+    await this.app.sync(plugin);
+    this.app.setupSync(plugin.name, 2);
+
   }
 }
+

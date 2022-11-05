@@ -1,5 +1,5 @@
 import { LastFM } from "../plugins/aggregators/lastfm/LastFM";
-import { Plugin } from "./Plugin";
+import { Plugin, SyncResponse } from "./Plugin";
 import dotenv from "dotenv";
 import assert from "assert";
 import { AppView } from "./AppView";
@@ -11,13 +11,13 @@ interface PersonalIdentifiableInformation {
 }
 
 type LifecycleEvent = "start";
-type SyncEvent = "start" | "sync" | "synced" | "syncError";
+type SyncEvent = "sync" | "synced" | "syncError";
 
 export class App {
   private plugins: Plugin[] = [];
   private view?: AppView;
   private lifeCycleListeners: Map<LifecycleEvent, (data?: unknown) => void> = new Map();
-  private pluginListeners: Map<string, ((event: SyncEvent, data: unknown) => void)[]>;
+  private pluginListeners: Map<string, ((event: SyncEvent, data: SyncResponse<unknown>) => void)[]>;
   constructor() {
     dotenv.config();
     this.plugins = [
@@ -34,6 +34,12 @@ export class App {
     return this;
   }
 
+  setupSync(plugin: string, timeStepSeconds: number = 10) {
+    const pluginInstance = this.plugins.find(p => p.name === plugin);
+    assert(pluginInstance, `Plugin ${plugin} not found`);
+    setInterval(() => this.sync(pluginInstance!), timeStepSeconds * 1000);
+  }
+
   addPlugin(plugin: Plugin) {
     assert(!this.plugins.find(p => p.name === plugin.name), `Plugin ${plugin.name} already exists`);
     this.plugins.push(plugin);
@@ -46,7 +52,7 @@ export class App {
   subscribe(plugin: string) {
     assert(this.plugins.find(p => p.name === plugin), `Plugin ${plugin} not found`);
     return {
-      on: (callback: (event: SyncEvent, data: unknown) => void) => {
+      on: (callback: (event: SyncEvent, data: SyncResponse<unknown>) => void) => {
         const listeners = this.pluginListeners.get(plugin) || [];
         listeners.push(callback);
         this.pluginListeners.set(plugin, listeners);
@@ -68,12 +74,12 @@ export class App {
     this.lifeCycleListeners.get("start")?.();
   }
 
-  private async sync(plugin: Plugin) {
+  async sync(plugin: Plugin) {
     const response = await plugin.sync();
     this.emit(plugin.name, "sync", response);
   }
 
-  private emit(plugin: string, event: SyncEvent, data: unknown) {
+  private emit(plugin: string, event: SyncEvent, data: SyncResponse<unknown>) {
     const listeners = this.pluginListeners.get(plugin) || [];
     listeners.forEach(listener => listener(event, data));
   }
