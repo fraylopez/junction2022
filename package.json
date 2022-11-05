@@ -1,5 +1,5 @@
 {
-  "name": "datafetcher",
+  "name": "@junction2022/datafetcher",
   "version": "0.0.1",
   "packageManager": "yarn@3.2.4",
   "devDependencies": {
