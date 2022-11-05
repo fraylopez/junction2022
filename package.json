@@ -1,5 +1,6 @@
 {
   "name": "junction2022",
+  "version": "0.0.1",
   "packageManager": "yarn@3.2.4",
   "devDependencies": {
     "@types/node": "^18.11.9",

@@ -13,7 +13,7 @@ interface PersonalIdentifiableInformation {
 type LifecycleEvent = "start";
 type SyncEvent = "sync" | "synced" | "syncError";
 
-export class App {
+export class DataFetcher {
   private plugins: Plugin[] = [];
   private view?: AppView;
   private lifeCycleListeners: Map<LifecycleEvent, (data?: unknown) => void> = new Map();

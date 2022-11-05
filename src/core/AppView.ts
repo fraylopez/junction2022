@@ -1,15 +1,15 @@
 import { Plugin, Privacy, SyncResponse } from "./Plugin";
 import prompt from "prompt";
-import { App } from "./App";
+import { DataFetcher } from "./DataFetcher";
 
 export class AppView {
   private plugins: Plugin[];
-  private app!: App;
+  private app!: DataFetcher;
   constructor() {
     this.plugins = [];
   }
 
-  init(app: App) {
+  init(app: DataFetcher) {
     this.app = app;
     this.app.on("start", () => {
       this.renderLaunch();

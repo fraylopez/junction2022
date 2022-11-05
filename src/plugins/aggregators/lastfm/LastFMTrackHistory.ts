@@ -1,4 +1,4 @@
-export interface LastFMTrackHistoryResponse {
+export interface LastFMTrackHistory {
   recenttracks: {
     track: Array<{
       artist: {
