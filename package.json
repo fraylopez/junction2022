@@ -1,5 +1,5 @@
 {
-  "name": "@junction2022/datafetcher",
+  "name": "@junction2022-c43/datafetcher",
   "version": "0.0.1",
   "packageManager": "yarn@3.2.4",
   "devDependencies": {
@@ -8,7 +8,6 @@
     "typescript": "4.8.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
     "start": "ts-node src/index.ts",
     "build": "tsc"
   },

@@ -45,9 +45,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@junction2022/datafetcher@workspace:.":
+"@junction2022-c43/datafetcher@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@junction2022/datafetcher@workspace:."
+  resolution: "@junction2022-c43/datafetcher@workspace:."
   dependencies:
     "@types/node": ^18.11.9
     "@types/prompt": ^1.1.4
