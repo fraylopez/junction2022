@@ -1,0 +1,25 @@
+@startuml
+
+class User
+
+User ..> DataCollectorService
+Spotify -up-|> DataCollectorService
+GPS -up-|> DataCollectorService
+
+User --> Credentials
+DataCollectorService --> Credentials
+
+User .up.> App
+App ..> Credentials
+App o--> Integration
+App *--> Operation
+Register -up-|> Operation
+Sync -up-|> Operation
+Authorize -up-|> Operation
+Register *--> Authorize
+Register *--> Sync
+Authorize *--> Sync
+Operation --> Integration
+Integration --> DataCollectorService
+
+@enduml
